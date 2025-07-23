@@ -3,17 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Don Golf Leaderboard</title>
-  <link rel="stylesheet" href="../css/style.css" />
+  <title>Leaderboard - Don Golf</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <h1>Don Golf Leaderboard</h1>
-  <iframe 
-  referrerpolicy="no-referrer-when-downgrade" 
-  height="600px" 
-  width="100%" 
-  style="border:none;" 
-  src="https://view-awesome-table.com/-OVbeIQ3FeRy6_rXGe6f/view">
-</iframe>
+  <div class="page-wrapper">
+    <div class="container">
+      <img src="assets/logo.png" alt="Don Golf Logo" class="logo" />
+      <h1 class="headline">Don Golf Leaderboard</h1>
+    </div>
+
+    <div class="leaderboard-iframe-wrapper">
+      <iframe
+        src="https://view-awesome-table.com/-OVbeIQ3FeRy6_rXGe6f/view"
+        class="leaderboard-iframe"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
 </body>
 </html>
