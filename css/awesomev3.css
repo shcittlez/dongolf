@@ -1,0 +1,46 @@
+/* Global container override */
+.awesome-table-container {
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+  font-family: Arial, sans-serif !important;
+}
+
+/* Header row */
+.awesome-table-container thead tr {
+  background-color: #111 !important;
+  color: #00bfff !important;
+  border-bottom: 1px solid #222 !important;
+  box-shadow: none !important;
+}
+
+/* Table body rows */
+.awesome-table-container tbody tr {
+  background-color: #0a0a0a !important;
+  border-bottom: 1px solid #222 !important;
+}
+
+/* Consistent row background to remove white gaps */
+.awesome-table-container tbody tr:nth-child(even),
+.awesome-table-container tbody tr:nth-child(odd) {
+  background-color: #0a0a0a !important;
+}
+
+/* Center-align all table text */
+.awesome-table-container th,
+.awesome-table-container td {
+  text-align: center !important;
+  vertical-align: middle !important;
+  padding: 10px !important;
+}
+
+/* Scrollbar (if shown) */
+.awesome-table-container ::-webkit-scrollbar {
+  width: 6px;
+}
+.awesome-table-container ::-webkit-scrollbar-track {
+  background: transparent;
+}
+.awesome-table-container ::-webkit-scrollbar-thumb {
+  background-color: #333;
+  border-radius: 3px;
+}
