@@ -10,19 +10,30 @@
 <body>
   <div class="page-wrapper">
     <div class="container">
-      <a href="index.html"><img src="assets/logo.png" alt="Don Golf Logo" class="logo" /></a>
+      <a href="index.html">
+        <img src="assets/logo.png" alt="Don Golf Logo" class="logo" />
+      </a>
       <h1 class="headline">Get Notified</h1>
       <p class="subhead">Tell us where to reach you and which item you’re excited about. We’ll email you when it drops.</p>
     </div>
 
-    <form name="notify" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/thank-you.html" class="notify-form">
-      <!-- Netlify: anti-spam honeypot -->
-      <input type="hidden" name="form-name" value="notify">
+    <form
+      name="notify"
+      method="POST"
+      data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      action="/thank-you/"
+      class="notify-form"
+      autocomplete="on"
+    >
+      <!-- Netlify form identity -->
+      <input type="hidden" name="form-name" value="notify" />
+      <!-- Honeypot (anti-spam) -->
       <p style="display:none">
         <label>Don’t fill this out: <input name="bot-field" /></label>
       </p>
 
-      <!-- Product (prefilled via URL) -->
+      <!-- Product (prefilled from ?product=...) -->
       <div class="form-field">
         <label for="product">Product</label>
         <input id="product" name="product" type="text" readonly />
@@ -30,12 +41,12 @@
 
       <div class="form-field">
         <label for="name">Name</label>
-        <input id="name" name="name" type="text" required />
+        <input id="name" name="name" type="text" required autocomplete="name" />
       </div>
 
       <div class="form-field">
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" required />
+        <input id="email" name="email" type="email" required autocomplete="email" />
       </div>
 
       <div class="form-actions">
@@ -44,11 +55,12 @@
       </div>
     </form>
   </div>
+
+  <script>
+    // Prefill the Product field from ?product=...
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById('product').value = params.get('product') || '';
+  </script>
 </body>
-<script>
-  // Prefill the product field from ?product=... in the URL
-  const params = new URLSearchParams(window.location.search);
-  const product = params.get('product') || '';
-  document.getElementById('product').value = product;
-</script>
 </html>
+
