@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notify Me – Don Golf</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="container">
+      <a href="index.html"><img src="assets/logo.png" alt="Don Golf Logo" class="logo" /></a>
+      <h1 class="headline">Get Notified</h1>
+      <p class="subhead">Tell us where to reach you and which item you’re excited about. We’ll email you when it drops.</p>
+    </div>
+
+    <form name="notify" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/thank-you.html" class="notify-form">
+      <!-- Netlify: anti-spam honeypot -->
+      <input type="hidden" name="form-name" value="notify">
+      <p style="display:none">
+        <label>Don’t fill this out: <input name="bot-field" /></label>
+      </p>
+
+      <!-- Product (prefilled via URL) -->
+      <div class="form-field">
+        <label for="product">Product</label>
+        <input id="product" name="product" type="text" readonly />
+      </div>
+
+      <div class="form-field">
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required />
+      </div>
+
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="button">Notify Me</button>
+        <a href="merch.html" class="button" style="background:#222;color:#fff;">Back to Merch</a>
+      </div>
+    </form>
+  </div>
+</body>
+<script>
+  // Prefill the product field from ?product=... in the URL
+  const params = new URLSearchParams(window.location.search);
+  const product = params.get('product') || '';
+  document.getElementById('product').value = product;
+</script>
+</html>

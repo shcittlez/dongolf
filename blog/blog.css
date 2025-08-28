@@ -65,6 +65,8 @@ a:hover {
   height: auto;
   border-radius: 6px;
   margin-bottom: 1rem;
+  object-fit: cover;
+  max-height: 300px; /* ✅ cap image height */
 }
 
 .post-title {
@@ -161,6 +163,29 @@ a:hover {
 }
 
 #back-to-top:hover {
+  background-color: #009acc;
+  transform: scale(1.1);
+}
+/* --- Floating Instagram Button --- */
+.social-link {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #00bfff;
+  color: black;
+  font-size: 1.5rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+  transition: background 0.3s ease, transform 0.2s ease;
+  z-index: 200;
+  text-decoration: none;
+}
+.social-link:hover {
   background-color: #009acc;
   transform: scale(1.1);
 }
