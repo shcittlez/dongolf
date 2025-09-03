@@ -335,3 +335,32 @@ body {
   background:#0f0f0f; padding:3px 8px; border-radius:6px; border:1px solid #1f2937;
 }
 
+/* --- Homepage buttons --- */
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;   /* allow wrapping instead of forcing full width */
+  margin: 0 auto;
+  padding: 0 8px;    /* small breathing room from screen edges */
+}
+
+.buttons .button {
+  flex: 0 0 auto;    /* keep natural button width */
+  text-align: center;
+}
+
+/* --- Merch page hero buttons --- */
+.merch-hero {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;   /* allow wrapping on smaller screens */
+  margin-top: 1rem;
+}
+
+.merch-hero .button {
+  flex: 0 0 auto;    /* no forced expansion */
+  text-align: center;
+}
+
