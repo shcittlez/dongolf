@@ -292,3 +292,50 @@ body {
   flex-wrap: wrap;
   align-items: center;
 }
+
+/* Don Golf custom leaderboard table */
+.leaderboard-card {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Table */
+.dg-table { width: 100%; border-collapse: collapse; }
+.dg-th, .dg-td { padding: 12px 14px; border-bottom: 1px solid #1a1a1a; }
+.dg-th {
+  text-align: left; color: #9fc8ff; font-weight: bold; font-size: 0.95rem;
+  cursor: pointer; user-select: none;
+}
+.dg-tr:hover { background: rgba(0,191,255,.08); }
+
+/* Controls */
+.dg-controls {
+  display: flex; gap: 12px; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border-bottom: 1px solid #1a1a1a; color: #ccc;
+}
+.dg-search {
+  width: 260px; max-width: 100%;
+  padding: 8px 10px; border-radius: 8px; border: 1px solid #222;
+  background: #0a0a0a; color: #fff; outline: none;
+}
+.dg-search:focus { border-color: #00bfff; }
+.dg-pager { display: flex; gap: 8px; align-items: center; }
+.dg-btn {
+  background: #00bfff; color: #000; border: 0; padding: 8px 12px; border-radius: 8px;
+  font-weight: bold; cursor: pointer;
+}
+.dg-btn:disabled { opacity: .5; cursor: not-allowed; }
+.dg-meta { font-size: .9rem; color: #aaa; }
+
+/* Mono tag chip */
+.dg-tagcode {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  background:#0f0f0f; padding:3px 8px; border-radius:6px; border:1px solid #1f2937;
+}
+
+/* Mobile tweaks */
+@media (max-width: 720px) {
+  .dg-col-location { display:none; }
+}

@@ -26,13 +26,9 @@
     </section>
 
     <div class="leaderboard-iframe-wrapper">
-      <iframe
-        src="https://view-awesome-table.com/-OW-iNZ_cnQODhcpPUrq/view"
-        class="leaderboard-iframe"
-        allowfullscreen
-      ></iframe>
+      <div id="leaderboard" class="leaderboard-card"></div>
     </div>
-  </div>
+
 
   <!-- Blog Promo Section -->
   <section class="blog-promo">
@@ -47,5 +43,153 @@
   <a class="social-link" href="https://www.instagram.com/thedongolfer/" target="_blank" aria-label="Follow us on Instagram">
     <i class="fa-brands fa-instagram"></i>
   </a>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script>
+  // Your published CSV URL:
+  const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcpWn8GTDSMAok7uw40yM7j8mDRkD67DQCkauSuEnzQM8rgL8YMWQEfsOEZkbdXH1HPTkgkQfmvKsk/pub?gid=833273816&single=true&output=csv';
+
+  // Map EXACT header names from "Leaderboard Data"
+  const COLS = {
+    tag: 'Tag #',
+    name: 'Name',
+    location: 'Location',
+  };
+
+  // Fetch + parse CSV
+  function fetchCSV() {
+    const url = CSV_URL + '&_ts=' + Date.now(); // cache-bust
+    return new Promise((resolve) => {
+      Papa.parse(url, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: (res) => resolve(res.data)
+      });
+    });
+  }
+
+  // State
+  let rows = [];
+  let view = [];
+  let page = 0;
+  let pageSize = 25;
+  let sortKey = 'tag';
+  let sortDir = 'asc';
+  let q = '';
+
+  function normalize(r) {
+    return {
+      tag: r[COLS.tag] ?? '',
+      name: r[COLS.name] ?? '',
+      location: r[COLS.location] ?? ''
+    };
+  }
+
+  function filterSortPaginate() {
+    const needle = q.trim().toLowerCase();
+    view = !needle ? [...rows] : rows.filter(r =>
+      (r.tag||'').toLowerCase().includes(needle) ||
+      (r.name||'').toLowerCase().includes(needle) ||
+      (r.location||'').toLowerCase().includes(needle)
+    );
+
+    view.sort((a,b) => {
+      const A = (a[sortKey] ?? '').toString().toLowerCase();
+      const B = (b[sortKey] ?? '').toString().toLowerCase();
+      const numA = +A, numB = +B;
+      if (!isNaN(numA) && !isNaN(numB)) return sortDir === 'asc' ? (numA-numB) : (numB-numA);
+      return sortDir === 'asc' ? A.localeCompare(B) : B.localeCompare(A);
+    });
+  }
+
+  function render() {
+    const root = document.getElementById('leaderboard');
+    root.innerHTML = '';
+
+    // Controls
+    const controls = document.createElement('div');
+    controls.className = 'dg-controls';
+    controls.innerHTML = `
+      <input id="dg-search" class="dg-search" type="search" placeholder="Search tag, name, location…" />
+      <div class="dg-pager">
+        <span class="dg-meta" id="dg-meta"></span>
+        <button id="dg-prev" class="dg-btn">Prev</button>
+        <button id="dg-next" class="dg-btn">Next</button>
+      </div>
+    `;
+    root.appendChild(controls);
+
+    // Table
+    const table = document.createElement('table');
+    table.className = 'dg-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th class="dg-th" data-k="tag">Tag #</th>
+          <th class="dg-th" data-k="name">Name</th>
+          <th class="dg-th dg-col-location" data-k="location">Location</th>
+        </tr>
+      </thead>
+      <tbody id="dg-body"></tbody>
+    `;
+    root.appendChild(table);
+
+    // Page slice
+    const start = page * pageSize;
+    const slice = view.slice(start, start + pageSize);
+    const tbody = table.querySelector('#dg-body');
+    slice.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.className = 'dg-tr';
+      tr.innerHTML = `
+        <td class="dg-td"><span class="dg-tagcode">${r.tag}</span></td>
+        <td class="dg-td">${r.name || ''}</td>
+        <td class="dg-td dg-col-location">${r.location || ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Controls wiring
+    document.getElementById('dg-search').value = q;
+    document.getElementById('dg-search').oninput = (e) => { q = e.target.value; page = 0; filterSortPaginate(); render(); };
+
+    table.querySelectorAll('.dg-th').forEach(th => {
+      th.onclick = () => {
+        const k = th.dataset.k;
+        sortDir = (sortKey === k && sortDir === 'asc') ? 'desc' : 'asc';
+        sortKey = k; filterSortPaginate(); render();
+      };
+    });
+
+    const total = view.length;
+    const end = Math.min(start + pageSize, total);
+    document.getElementById('dg-meta').textContent = `${total} players · showing ${start+1}-${end}`;
+    const prev = document.getElementById('dg-prev');
+    const next = document.getElementById('dg-next');
+    prev.disabled = page === 0;
+    next.disabled = end >= total;
+    prev.onclick = () => { if (page>0){ page--; render(); } };
+    next.onclick = () => { if (end < total){ page++; render(); } };
+  }
+
+  async function init() {
+    const data = await fetchCSV();
+    rows = data.map(normalize);
+    filterSortPaginate();
+    render();
+
+    // Auto-refresh every 60s
+    setInterval(async () => {
+      const newData = await fetchCSV();
+      rows = newData.map(normalize);
+      filterSortPaginate();
+      render();
+    }, 60000);
+  }
+
+  init();
+</script>
+
 </body>
 </html>
