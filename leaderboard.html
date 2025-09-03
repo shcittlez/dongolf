@@ -44,19 +44,20 @@
     <i class="fa-brands fa-instagram"></i>
   </a>
 
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script>
-  // Your published CSV URL:
-  const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcpWn8GTDSMAok7uw40yM7j8mDRkD67DQCkauSuEnzQM8rgL8YMWQEfsOEZkbdXH1HPTkgkQfmvKsk/pub?gid=833273816&single=true&output=csv';
+  // ====== Config ======
+  const CSV_URL =
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcpWn8GTDSMAok7uw40yM7j8mDRkD67DQCkauSuEnzQM8rgL8YMWQEfsOEZkbdXH1HPTkgkQfmvKsk/pub?gid=833273816&single=true&output=csv';
 
-  // Map EXACT header names from "Leaderboard Data"
+  // We normalize headers to lowercase (with trim), so map in lowercase:
   const COLS = {
-    tag: 'Tag #',
-    name: 'Name',
-    location: 'Location',
+    tag: 'tag #',
+    name: 'name',
+    location: 'location',
   };
 
-  // Fetch + parse CSV
+  // ====== Data fetch & parse ======
   function fetchCSV() {
     const url = CSV_URL + '&_ts=' + Date.now(); // cache-bust
     return new Promise((resolve) => {
@@ -64,50 +65,95 @@
         download: true,
         header: true,
         skipEmptyLines: true,
-        complete: (res) => resolve(res.data)
+        transformHeader: (h) => h.replace(/^\uFEFF/, '').trim().toLowerCase(),
+        complete: (res) => resolve(res.data),
       });
     });
   }
 
-  // State
+  // ====== State ======
   let rows = [];
   let view = [];
   let page = 0;
-  let pageSize = 25;
+  const pageSize = 25;
   let sortKey = 'tag';
   let sortDir = 'asc';
   let q = '';
+
+  // Cache DOM refs so we only rebuild tbody/meta on updates
+  const el = {};
 
   function normalize(r) {
     return {
       tag: r[COLS.tag] ?? '',
       name: r[COLS.name] ?? '',
-      location: r[COLS.location] ?? ''
+      location: r[COLS.location] ?? '',
     };
   }
 
-  function filterSortPaginate() {
-    const needle = q.trim().toLowerCase();
-    view = !needle ? [...rows] : rows.filter(r =>
-      (r.tag||'').toLowerCase().includes(needle) ||
-      (r.name||'').toLowerCase().includes(needle) ||
-      (r.location||'').toLowerCase().includes(needle)
-    );
+  function naturalKey(val) {
+    // helps sort tags like "001" or "#12" naturally
+    const num = String(val).replace(/[^\d]/g, '');
+    return num.length ? [0, parseInt(num, 10)] : [1, String(val).toLowerCase()];
+  }
 
-    view.sort((a,b) => {
-      const A = (a[sortKey] ?? '').toString().toLowerCase();
-      const B = (b[sortKey] ?? '').toString().toLowerCase();
-      const numA = +A, numB = +B;
-      if (!isNaN(numA) && !isNaN(numB)) return sortDir === 'asc' ? (numA-numB) : (numB-numA);
-      return sortDir === 'asc' ? A.localeCompare(B) : B.localeCompare(A);
+  function updateView() {
+    const needle = q.trim().toLowerCase();
+
+    view = !needle
+      ? [...rows]
+      : rows.filter((r) =>
+          (r.tag || '').toLowerCase().includes(needle) ||
+          (r.name || '').toLowerCase().includes(needle) ||
+          (r.location || '').toLowerCase().includes(needle)
+        );
+
+    view.sort((a, b) => {
+      const A = a[sortKey] ?? '';
+      const B = b[sortKey] ?? '';
+      // natural-ish sorting for tag values
+      if (sortKey === 'tag') {
+        const [aT, aN] = naturalKey(A);
+        const [bT, bN] = naturalKey(B);
+        const cmp = aT - bT || (aN < bN ? -1 : aN > bN ? 1 : 0);
+        return sortDir === 'asc' ? cmp : -cmp;
+      }
+      const aS = String(A).toLowerCase();
+      const bS = String(B).toLowerCase();
+      const aNum = +aS, bNum = +bS;
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return sortDir === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+      return sortDir === 'asc' ? aS.localeCompare(bS) : bS.localeCompare(aS);
     });
   }
 
-  function render() {
-    const root = document.getElementById('leaderboard');
-    root.innerHTML = '';
+  function renderBody() {
+    const start = page * pageSize;
+    const slice = view.slice(start, start + pageSize);
 
-    // Controls
+    el.tbody.innerHTML = '';
+    for (const r of slice) {
+      const tr = document.createElement('tr');
+      tr.className = 'dg-tr';
+      tr.innerHTML = `
+        <td class="dg-td"><span class="dg-tagcode">${r.tag}</span></td>
+        <td class="dg-td">${r.name || ''}</td>
+        <td class="dg-td dg-col-location">${r.location || ''}</td>
+      `;
+      el.tbody.appendChild(tr);
+    }
+
+    const end = Math.min(start + pageSize, view.length);
+    el.meta.textContent = `${view.length} players · showing ${view.length ? start + 1 : 0}-${end}`;
+    el.prev.disabled = page === 0;
+    el.next.disabled = end >= view.length;
+  }
+
+  function buildUI() {
+    const root = document.getElementById('leaderboard');
+
+    // Controls (build once)
     const controls = document.createElement('div');
     controls.className = 'dg-controls';
     controls.innerHTML = `
@@ -120,7 +166,7 @@
     `;
     root.appendChild(controls);
 
-    // Table
+    // Table shell (build once)
     const table = document.createElement('table');
     table.className = 'dg-table';
     table.innerHTML = `
@@ -135,61 +181,62 @@
     `;
     root.appendChild(table);
 
-    // Page slice
-    const start = page * pageSize;
-    const slice = view.slice(start, start + pageSize);
-    const tbody = table.querySelector('#dg-body');
-    slice.forEach(r => {
-      const tr = document.createElement('tr');
-      tr.className = 'dg-tr';
-      tr.innerHTML = `
-        <td class="dg-td"><span class="dg-tagcode">${r.tag}</span></td>
-        <td class="dg-td">${r.name || ''}</td>
-        <td class="dg-td dg-col-location">${r.location || ''}</td>
-      `;
-      tbody.appendChild(tr);
+    // Cache refs
+    el.search = controls.querySelector('#dg-search');
+    el.meta   = controls.querySelector('#dg-meta');
+    el.prev   = controls.querySelector('#dg-prev');
+    el.next   = controls.querySelector('#dg-next');
+    el.tbody  = table.querySelector('#dg-body');
+    el.headers= table.querySelectorAll('.dg-th');
+
+    // Wire once (keeps focus between updates)
+    el.search.addEventListener('input', () => {
+      q = el.search.value;
+      page = 0;
+      updateView();
+      renderBody();
     });
 
-    // Controls wiring
-    document.getElementById('dg-search').value = q;
-    document.getElementById('dg-search').oninput = (e) => { q = e.target.value; page = 0; filterSortPaginate(); render(); };
-
-    table.querySelectorAll('.dg-th').forEach(th => {
-      th.onclick = () => {
+    el.headers.forEach((th) => {
+      th.addEventListener('click', () => {
         const k = th.dataset.k;
-        sortDir = (sortKey === k && sortDir === 'asc') ? 'desc' : 'asc';
-        sortKey = k; filterSortPaginate(); render();
-      };
+        sortDir = sortKey === k && sortDir === 'asc' ? 'desc' : 'asc';
+        sortKey = k;
+        updateView();
+        renderBody();
+      });
     });
 
-    const total = view.length;
-    const end = Math.min(start + pageSize, total);
-    document.getElementById('dg-meta').textContent = `${total} players · showing ${start+1}-${end}`;
-    const prev = document.getElementById('dg-prev');
-    const next = document.getElementById('dg-next');
-    prev.disabled = page === 0;
-    next.disabled = end >= total;
-    prev.onclick = () => { if (page>0){ page--; render(); } };
-    next.onclick = () => { if (end < total){ page++; render(); } };
+    el.prev.addEventListener('click', () => {
+      if (page > 0) { page--; renderBody(); }
+    });
+    el.next.addEventListener('click', () => {
+      if ((page + 1) * pageSize < view.length) { page++; renderBody(); }
+    });
   }
 
   async function init() {
     const data = await fetchCSV();
     rows = data.map(normalize);
-    filterSortPaginate();
-    render();
 
-    // Auto-refresh every 60s
+    buildUI();          // build controls/table once
+    updateView();       // compute filtered/sorted view
+    renderBody();       // draw rows + meta
+
+    // Auto-refresh every 60s without nuking focus or scroll
     setInterval(async () => {
-      const newData = await fetchCSV();
-      rows = newData.map(normalize);
-      filterSortPaginate();
-      render();
+      const fresh = await fetchCSV();
+      rows = fresh.map(normalize);
+      const searchPos = el.search.selectionStart; // preserve caret
+      updateView();
+      renderBody();
+      // restore caret position if user is typing
+      el.search.setSelectionRange(searchPos, searchPos);
+      el.search.focus();
     }, 60000);
   }
 
   init();
 </script>
-
 </body>
 </html>

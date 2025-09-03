@@ -335,7 +335,3 @@ body {
   background:#0f0f0f; padding:3px 8px; border-radius:6px; border:1px solid #1f2937;
 }
 
-/* Mobile tweaks */
-@media (max-width: 720px) {
-  .dg-col-location { display:none; }
-}
