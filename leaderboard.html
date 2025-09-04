@@ -145,7 +145,7 @@
     }
 
     const end = Math.min(start + pageSize, view.length);
-    el.meta.textContent = `${view.length} players · showing ${view.length ? start + 1 : 0}-${end}`;
+    el.meta.textContent = `${view.length ? start + 1 : 0}-${end}`;
     el.prev.disabled = page === 0;
     el.next.disabled = end >= view.length;
   }
@@ -157,13 +157,19 @@
     const controls = document.createElement('div');
     controls.className = 'dg-controls';
     controls.innerHTML = `
-      <input id="dg-search" class="dg-search" type="search" placeholder="Search tag, name, location…" />
-      <div class="dg-pager">
-        <span class="dg-meta" id="dg-meta"></span>
-        <button id="dg-prev" class="dg-btn">Prev</button>
-        <button id="dg-next" class="dg-btn">Next</button>
-      </div>
-    `;
+  <input id="dg-search" class="dg-search" type="search" placeholder="Search tag, name, location…" />
+  <div class="dg-pager">
+    <span class="dg-meta" id="dg-meta"></span>
+    <button id="dg-prev" class="dg-btn" aria-label="Previous page">
+      <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      <span class="dg-btn-text">Prev</span>
+    </button>
+    <button id="dg-next" class="dg-btn" aria-label="Next page">
+      <span class="dg-btn-text">Next</span>
+      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    </button>
+  </div>
+`;
     root.appendChild(controls);
 
     // Table shell (build once)

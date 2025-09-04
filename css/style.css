@@ -364,3 +364,16 @@ body {
   text-align: center;
 }
 
+/* Leaderboard footer: responsive controls */
+.dg-controls { flex-wrap: wrap; }        /* allow wrapping on small screens */
+.dg-pager { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+.dg-btn { padding: 8px 12px; line-height: 1; } /* tighter buttons */
+.dg-btn i { font-size: 14px; }                 /* arrow size */
+
+/* On narrow phones: hide meta, use icon-only buttons */
+@media (max-width: 480px) {
+  .dg-meta { display: none; }             /* remove "1–25" if needed; JS will still set it */
+  .dg-btn-text { display: none; }         /* hide "Prev"/"Next" text */
+  .dg-btn { padding: 8px 10px; }          /* compact buttons */
+}
+
