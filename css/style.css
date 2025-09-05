@@ -21,7 +21,8 @@ body {
 .logo {
   display: block;
   margin: 0 auto 1rem;
-  max-width: 200px;
+  width: 200px;   /* force a fixed width */
+  height: auto;   /* keep aspect ratio */
 }
 
 .headline {
