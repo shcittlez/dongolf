@@ -30,6 +30,7 @@ body {
   text-align: center;
   margin-bottom: 2rem;
   letter-spacing: 2px;
+  color: #00bfff;
 }
 
 .buttons {
@@ -378,3 +379,92 @@ body {
   .dg-btn { padding: 8px 10px; }          /* compact buttons */
 }
 
+/* =======================================================
+   BUY PAGE LAYOUT — Pre-Registration Call-to-Action
+   ======================================================= */
+
+.hero-section {
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+}
+
+.hero-section h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  letter-spacing: 2px;
+  color: #00bfff;
+  text-transform: uppercase;
+}
+
+.hero-section p.subhead {
+  font-size: 1.2rem;
+  color: #ccc;
+  line-height: 1.8;
+  max-width: 600px;
+  margin: 0.75rem auto 2.5rem;
+}
+
+/* --- Product Highlight Card --- */
+.product-highlight {
+  text-align: center;
+  background: linear-gradient(180deg, #0a0a0a 0%, #0c0c0c 100%);
+  border-radius: 14px;
+  padding: 3rem 1.5rem;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  border: 1px solid #111;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.05);
+}
+
+.product-highlight img {
+  max-width: 300px;
+  margin-bottom: 1.5rem;
+}
+
+.product-highlight h3 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: #00bfff;
+}
+
+.product-highlight p {
+  color: #ddd;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.product-highlight .button {
+  margin-top: 1rem;
+  padding: 14px 36px;
+  font-size: 1.05rem;
+}
+
+/* --- How It Works (spacing tweaks for Buy page) --- */
+.how-it-works {
+  margin: 3rem auto;
+  padding: 2rem 1rem;
+  background: #0b0b0b;
+  border-radius: 10px;
+  border: 1px solid #111;
+  max-width: 600px;
+}
+
+.how-it-works p {
+  margin-bottom: 1.5rem;
+  color: #ccc;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .product-highlight {
+    padding: 2rem 1rem;
+  }
+
+  .hero-section h1 {
+    font-size: 1.8rem;
+  }
+}
